@@ -1,7 +1,11 @@
 #define WIN32_LEAN_AND_MEAN
 #define NOMINMAX
 #include <windows.h>
+#define XInputGetState AllyDrive_SDK_XInputGetState
+#define XInputSetState AllyDrive_SDK_XInputSetState
 #include <xinput.h>
+#undef XInputGetState
+#undef XInputSetState
 #include <cstdint>
 #include <cmath>
 #include <cstdio>
