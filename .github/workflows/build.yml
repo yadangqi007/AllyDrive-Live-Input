@@ -1,0 +1,41 @@
+
+name: Build AllyDrive Windows x64
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v6
+
+      - name: Configure CMake
+        run: cmake -S . -B build -A x64
+
+      - name: Compile Release
+        run: cmake --build build --config Release --parallel
+
+      - name: Run tests
+        run: ctest --test-dir build -C Release --output-on-failure
+
+      - name: Package files
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path dist | Out-Null
+          Copy-Item "build\Release\XINPUT9_1_0.dll" "dist\"
+          Copy-Item "allydrive.ini" "dist\"
+          Compress-Archive -Path "dist\*" -DestinationPath "AllyDrive-0.4.0-win-x64.zip" -Force
+
+      - name: Upload compiled files
+        uses: actions/upload-artifact@v4
+        with:
+          name: AllyDrive-0.4.0-win-x64
+          path: AllyDrive-0.4.0-win-x64.zip
+          if-no-files-found: error
+          retention-days: 7
